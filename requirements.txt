@@ -2,6 +2,7 @@ blinker==1.8.2
 click==8.1.7
 flask==3.0.3
 Flask-Cors==4.0.1
+Flask-Mail==0.9.1
 flask-sqlalchemy==3.1.1
 greenlet==3.0.3
 importlib-metadata==7.1.0
@@ -13,3 +14,4 @@ SQLAlchemy==2.0.30
 typing-extensions==4.12.2
 werkzeug==3.0.3
 zipp==3.19.2
+python-dotenv==1.0.1

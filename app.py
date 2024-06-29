@@ -1,15 +1,44 @@
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import ForeignKey, Date
 from flask_cors import CORS
+from flask_mail import Mail, Message
 import logging
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 app = Flask(__name__)
+
+app.config['DB_USER'] = os.getenv('DB_USER')
+app.config['DB_HOST'] = os.getenv('DB_HOST')
+app.config['DB_DATABASE'] = os.getenv('DB_DATABASE')
+app.config['DB_PORT'] = os.getenv('DB_PORT')
+
+app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER')
+app.config['MAIL_PORT'] = os.getenv('MAIL_PORT')
+app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
+app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER')
+# Set default for MAIL_USE_TLS or handle NoneType
+mail_tls = os.getenv('MAIL_MAIL_TLS')
+app.config['MAIL_USE_TLS'] = mail_tls and mail_tls.lower() == 'true'
+
+
+
 # Configure CORS to allow requests from localhost:3000
 CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 
 # Database configuration
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://mattdrivas@localhost:54320/financial_planning'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://{user}@{host}:{port}/{database}'.format(
+    user=app.config['DB_USER'],
+    host=app.config['DB_HOST'],
+    port=app.config['DB_PORT'],
+    database=app.config['DB_DATABASE']
+)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
 db = SQLAlchemy(app)
 
 # Set up logging
@@ -50,8 +79,6 @@ def get_data():
             'tasks': client.tasks
         })
     return jsonify(clients_list)
-
-
 
 
 if __name__ == '__main__':
