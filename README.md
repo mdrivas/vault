@@ -38,3 +38,12 @@ MAIL_PASSWORD=
 MAIL_DEFAULT_SENDER=
 MAIL_USE_TLS=
 
+# For gh, push auth with 
+```bash
+git config --local credential.helper ""
+``` 
+
+then run
+```bash
+git push origin master
+```

@@ -80,6 +80,42 @@ def get_data():
         })
     return jsonify(clients_list)
 
+@app.route('/send_email', methods=['POST'])
+def send_email():
+    #Fetch client
+    client = Client.query.filter_y(id=2).first()
+    print("Sending client: ", client) 
+
+    #Fetch content
+    content = "TEST CONTENT" #Placeholder
+    
+    #Generate email 
+    email_content = generate_email_content(client, content)
+
+    #Send email
+    send_email(client.email, "FSW Email", email_content)
+    print("email sent for: ", client)
+    return
+
+def generate_email_content(client, content):
+    return f"""
+    Hello {client.first_name} {client.last_name},
+
+    Here is your personalized email:
+
+    {content}
+
+    Regards, 
+    FSW Team
+    """
+
+
+def send_email(to, subeject, body):
+    msg = Message(subeject, recipients=[to])
+    msg.body = body
+    mail.send(msg)
+    return "Email sent successfully"
+
 
 if __name__ == '__main__':
     app.run(debug=True)
