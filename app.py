@@ -49,22 +49,26 @@ class Client(db.Model):
     first_name = db.Column(db.String(100), nullable=False)
     last_name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
-    tasks = db.Column(db.JSON, nullable=True)
+    tasks = db.Column(db.JSON, nullable=True, default=list)  # Default to a list
 
 # Create the database schema within the application context
 with app.app_context():
     db.create_all()
 
-@app.route('/add_client', methods=['OPTIONS', 'POST'])
+@app.route('/add_client', methods=['POST'])
 def add_client():
-    
-    if request.method == 'POST':
-        data = request.json
-        logging.info(f"Received data: {data}")
-        new_client = Client(name=data['name'], email=data['email'], tasks={})
-        db.session.add(new_client)
-        db.session.commit()
-        return jsonify({'message': 'Client added successfully!'}), 201
+    data = request.json
+    logging.info(f"Received data: {data}")
+    new_client = Client(
+        first_name=data['first_name'],
+        last_name=data['last_name'],
+        email=data['email'],
+        tasks={}
+    )
+    db.session.add(new_client)
+    db.session.commit()
+    return jsonify({'message': 'Client added successfully!'}), 201
+
 
 @app.route('/api/data', methods=['GET'])
 def get_data():
@@ -115,6 +119,37 @@ def send_email(to, subeject, body):
     msg.body = body
     mail.send(msg)
     return "Email sent successfully"
+@app.route('/api/client/<int:client_id>', methods=['GET'])
+def get_client(client_id):
+    client = Client.query.get(client_id)
+    if client is None:
+        return jsonify({'error': 'Client not found'}), 404
+    
+    client_data = {
+        'id': client.id,
+        'first_name': client.first_name,
+        'last_name': client.last_name,
+        'email': client.email,
+        'tasks': client.tasks
+    }
+    return jsonify(client_data)
+
+@app.route('/api/client/<int:client_id>/tasks', methods=['POST'])
+def add_task(client_id):
+    data = request.json
+    client = Client.query.get(client_id)
+    if client is None:
+        return jsonify({'error': 'Client not found'}), 404
+
+    # Ensure tasks is a dictionary
+    if client.tasks is None or isinstance(client.tasks, list):
+        client.tasks = {}
+
+    # Add new task
+    client.tasks[data['taskName']] = data['assignee']
+    db.session.commit()
+    return jsonify({'message': 'Task added successfully!'}), 201
+
 
 
 if __name__ == '__main__':
