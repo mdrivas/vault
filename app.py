@@ -23,8 +23,9 @@ app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
 app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER')
 # Set default for MAIL_USE_TLS or handle NoneType
 mail_tls = os.getenv('MAIL_MAIL_TLS')
-app.config['MAIL_USE_TLS'] = mail_tls and mail_tls.lower() == 'true'
+app.config['MAIL_USE_TLS'] = True
 
+mail = Mail(app)
 
 
 # Configure CORS to allow requests from localhost:3000
@@ -87,8 +88,10 @@ def get_data():
 @app.route('/send_email', methods=['POST'])
 def send_email():
     #Fetch client
-    client = Client.query.filter_y(id=2).first()
-    print("Sending client: ", client) 
+    client = Client.query.filter_by(id=2).first()
+    if not client:
+        return jsonify({'error': 'Client not found'}), 404
+    print("Sending to client: ", client) 
 
     #Fetch content
     content = "TEST CONTENT" #Placeholder
@@ -97,9 +100,9 @@ def send_email():
     email_content = generate_email_content(client, content)
 
     #Send email
-    send_email(client.email, "FSW Email", email_content)
+    create_email(client.email, "FSW Email", email_content)
     print("email sent for: ", client)
-    return
+    return jsonify({'message': 'Email sent successfully'}), 200
 
 def generate_email_content(client, content):
     return f"""
@@ -114,11 +117,12 @@ def generate_email_content(client, content):
     """
 
 
-def send_email(to, subeject, body):
+def create_email(to, subeject, body):
     msg = Message(subeject, recipients=[to])
     msg.body = body
     mail.send(msg)
-    return "Email sent successfully"
+    return "Email created successfully"
+
 @app.route('/api/client/<int:client_id>', methods=['GET'])
 def get_client(client_id):
     client = Client.query.get(client_id)
