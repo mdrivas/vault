@@ -55,16 +55,20 @@ class Client(db.Model):
 with app.app_context():
     db.create_all()
 
-@app.route('/add_client', methods=['OPTIONS', 'POST'])
+@app.route('/add_client', methods=['POST'])
 def add_client():
-    
-    if request.method == 'POST':
-        data = request.json
-        logging.info(f"Received data: {data}")
-        new_client = Client(name=data['name'], email=data['email'], tasks={})
-        db.session.add(new_client)
-        db.session.commit()
-        return jsonify({'message': 'Client added successfully!'}), 201
+    data = request.json
+    logging.info(f"Received data: {data}")
+    new_client = Client(
+        first_name=data['first_name'],
+        last_name=data['last_name'],
+        email=data['email'],
+        tasks={}
+    )
+    db.session.add(new_client)
+    db.session.commit()
+    return jsonify({'message': 'Client added successfully!'}), 201
+
 
 @app.route('/api/data', methods=['GET'])
 def get_data():
