@@ -3,7 +3,8 @@ from flask_cors import CORS
 from flask_mail import Mail
 from flask_migrate import Migrate
 from dotenv import load_dotenv
-from app.clients.models import db, Client
+from app.db import db
+from app.clients.models import Client
 from app.tasks.models import Tasks, StatusEnum
 from app.clients.controllers import client_bp
 from app.email.controllers import email_bp

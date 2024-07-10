@@ -1,7 +1,8 @@
 # app/client/controllers.py
 from flask import Blueprint, request, jsonify
-from .models import Client, db
+from .models import Client
 import logging
+from app.db import db
 
 client_bp = Blueprint('client', __name__)
 
@@ -42,3 +43,8 @@ def get_client(client_id):
         'email': client.email
     }
     return jsonify(client_data)
+
+@client_bp.route('/api/clients/count', methods=['GET'])
+def get_client_count():
+    count = Client.query.count()
+    return jsonify({'count': count})

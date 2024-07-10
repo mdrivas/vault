@@ -1,10 +1,10 @@
-# manage.py
 import sys
 import os
 from flask_migrate import Migrate
 from app import create_app
-from app.clients.models import db
-from app.tasks.models import Task, StatusEnum
+from app.db import db
+from app.clients.models import Client
+from app.tasks.models import Tasks, StatusEnum
 
 # Ensure the app directory is in the Python path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))

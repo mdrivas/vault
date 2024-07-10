@@ -1,17 +1,15 @@
-from flask_sqlalchemy import SQLAlchemy
+from app.db import db
 from sqlalchemy import Enum
 import enum
-
-
-db = SQLAlchemy()
 
 class StatusEnum(enum.Enum):
     not_assigned = "Not Assigned"
     in_progress = "In Progress"
     completed = "Completed"
 
-
 class Tasks(db.Model):
+    __tablename__ = 'tasks'
+    
     id = db.Column(db.Integer, primary_key=True)
     assignee = db.Column(db.String(100), nullable=False)
     task = db.Column(db.String(255), nullable=False)
